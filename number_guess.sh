@@ -46,17 +46,18 @@ done
 
 echo "You guessed it in $NUMBER_OF_GUESSES tries. The secret number was $RANDOM_NUMBER. Nice job!"   
 
-GAMES_PLAYED=$((GAMES_PLAYED+=1))
-
 if [[ -z $USERNAME_INFO ]]
 then
 echo $($PSQL "INSERT INTO number_guess(username, best_game, games_played) VALUES('$USERNAME', $NUMBER_OF_GUESSES, $GAMES_PLAYED)")
 else
+  BEST_GAME=$($PSQL "SELECT best_game FROM number_guess WHERE username='$USERNAME'")
+  GAMES_PLAYED=$($PSQL "SELECT games_played FROM number_guess WHERE username='$USERNAME'")
+  ((GAMES_PLAYED++))
   if [[ $NUMBER_OF_GUESSES -lt $BEST_GAME ]]
   then
-  echo $($PSQL "INSERT INTO number_guess(username, best_game, games_played) VALUES('$USERNAME', $BEST_GAME, $GAMES_PLAYED)")
+  echo $($PSQL "UPDATE number_guess SET best_game=$NUMBER_OF_GUESSES, games_played=$GAMES_PLAYED WHERE username='$USERNAME'")
   else
-  echo $($PSQL "INSERT INTO number_guess(username, best_game, games_played) VALUES('$USERNAME', $NUMBER_OF_GUESSES, $GAMES_PLAYED)")
+  echo $($PSQL "UPDATE number_guess SET games_played=$GAMES_PLAYED WHERE username='$USERNAME'")
   fi  
 fi
 
