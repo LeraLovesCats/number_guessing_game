@@ -21,33 +21,34 @@ fi
 echo "Guess the secret number between 1 and 1000:"
 read INPUT
 
-until [[ $INPUT =~ ^[0-9]+$ ]]
-do
-echo "That is not an integer, guess again:"
-read INPUT
-done
-
 RANDOM_NUMBER=$(( $RANDOM % 1000 + 1 ))
 NUMBER_OF_GUESSES=1
 
-until [[ $RANDOM_NUMBER == $INPUT ]]
+while [[ $INPUT != $RANDOM_NUMBER ]]
 do
-  if [[ $RANDOM_NUMBER -lt $INPUT ]]
+  if [[ $INPUT =~ ^[0-9]+$ ]]
   then
-  echo "It's lower than that, guess again:"
-  read INPUT
-  ((NUMBER_OF_GUESSES++))
-  else 
-  echo "It's higher than that, guess again:"
-  read INPUT
-  ((NUMBER_OF_GUESSES++))
-  fi
+    if [[ $RANDOM_NUMBER -lt $INPUT ]]
+    then
+    echo "It's lower than that, guess again:"
+    read INPUT
+    ((NUMBER_OF_GUESSES++))
+    else 
+    echo "It's higher than that, guess again:"
+    read INPUT
+    ((NUMBER_OF_GUESSES++))
+    fi
+  else
+  echo "That is not an integer, guess again:"
+  read INPUT  
+fi
 done
 
-echo "You guessed it in $NUMBER_OF_GUESSES tries. The secret number was $RANDOM_NUMBER. Nice job!"   
+echo "You guessed it in $NUMBER_OF_GUESSES tries. The secret number was $RANDOM_NUMBER. Nice job!" 
 
 if [[ -z $USERNAME_INFO ]]
 then
+GAMES_PLAYED=1
 echo $($PSQL "INSERT INTO number_guess(username, best_game, games_played) VALUES('$USERNAME', $NUMBER_OF_GUESSES, $GAMES_PLAYED)")
 else
   BEST_GAME=$($PSQL "SELECT best_game FROM number_guess WHERE username='$USERNAME'")
