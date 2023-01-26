@@ -43,7 +43,6 @@ do
 fi
 done
 
-
 echo "You guessed it in $NUMBER_OF_GUESSES tries. The secret number was $RANDOM_NUMBER. Nice job!" 
 
 BEST_GAME=$($PSQL "SELECT best_game FROM number_guess WHERE username='$USERNAME'")
